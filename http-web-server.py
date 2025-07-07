@@ -15,7 +15,7 @@ print(f"Server in running, listen port {PORT}...")
 try:
     while True:
         client_socket, client_addr = server_socket.accept()
-        print(f"Connnection from: {client_addr[0]}:{client_addr[1]}")
+        print(f"\nConnnection from: {client_addr[0]}:{client_addr[1]}")
         try:
             request = client_socket.recv(1024).decode()
             request_line = request.splitlines()[0]
