@@ -23,7 +23,7 @@ def handle_client(conn_socket, client_addr):
 
 
 def main():
-    """ A simple concurrent TCP server that handles multiple clients """
+    """一个"简单的 TCP 服务器，能够处理多个客户端连接，每个连接在独立的线程中处理"""
 
     server_name, server_port = '127.0.0.1', 18000
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,13 +41,12 @@ def main():
             t.start()
             threads.append(t)
     except KeyboardInterrupt:
-        print("\nServer shutting down...")
+        print("\nServer shutting down...")  # Ctrl+C 触发的异常
     finally:
-        server_socket.close()
+        server_socket.close()  # 关闭服务器套接字, 不再接受新的连接
         print("Server socket closed.")
         for t in threads:
-            # 阻塞主线程, 直到所有以的子线程执行完毕
-            t.join()
+            t.join()  # 阻塞主线程, 直到所有以的子线程执行完毕
         print("All threads have finished execution.")
 
 
