@@ -6,13 +6,12 @@ def handle_client(conn_socket, client_addr):
     # 在 TCP 中，每一个 conn_socket 都是由一个四元组唯一标识的: (client_ip, client_port, server_ip, server_port)
     client_addr = conn_socket.getpeername()
     server_addr = conn_socket.getsockname()
-    print(f"[{threading.current_thread().name}] handling client")
-    print(f"Connection established with {client_addr[0]}:{client_addr[1]}")
+    print(f"[{threading.current_thread().name}] handling [client {client_addr}]")
     try:
         while True:
             message = conn_socket.recv(2048)
             if not message:
-                print(f"Client {client_addr} disconnected.")
+                print(f"[Client {client_addr}] disconnected.")
                 break
             print(f"[Client {client_addr}]: {message.decode()}")
             modified_message = message.decode().upper()
