@@ -23,12 +23,12 @@ def main():
     client_socket.sendall(request.encode())
 
     # 接收响应（分段读取直到 socket 关闭）
-    response = b""
-    while True:
-        data = client_socket.recv(1024)
-        if not data:
-            break
-        response += data
+    response = client_socket.recv(4096)
+    # while True:
+    #     data = client_socket.recv(1024)
+    #     if not data:
+    #         break
+    #     response += data
 
     # 关闭连接
     client_socket.close()
