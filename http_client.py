@@ -4,36 +4,26 @@ import socket
 def main():
     """A simple HTTP client that connects to a server, sends a GET request, and prints the response."""
 
-    HOST = '127.0.0.1'  # 服务器地址
-    PORT = 9999         # 服务器端口
+    server_addr = '127.0.0.1'  # 服务器地址
+    server_port = 9999         # 服务器端口
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((HOST, PORT))
+    client_socket.connect((server_addr, server_port))
 
     # 构造 HTTP 请求
     request = (
         "GET / HTTP/1.1\r\n"
-        f"Host: {HOST}:{PORT}\r\n"
-        "Connection: close\r\n"
-        "User-Agent: MySimpleClient/1.0\r\n"
+        f"Host: {server_addr}:{server_port}\r\n"
+        "Connection: keep-alive\r\n"
+        "User-Agent: Guanjie's Client\r\n"
         "\r\n"
     )
 
-    # 发送请求
-    client_socket.sendall(request.encode())
+    client_socket.sendall(request.encode())  # 发送请求
+    response = client_socket.recv(1024)      # 接收响应
+    print(f"\n{response.decode()}")          # 打印服务器响应
 
-    # 接收响应（分段读取直到 socket 关闭）
-    response = client_socket.recv(4096)
-    # while True:
-    #     data = client_socket.recv(1024)
-    #     if not data:
-    #         break
-    #     response += data
-
-    # 关闭连接
-    client_socket.close()
-    # 输出响应(包括状态行、头部和主体)
-    print(response.decode())
+    client_socket.close()                    # 关闭客户端套接字
 
 
 if __name__ == "__main__":
