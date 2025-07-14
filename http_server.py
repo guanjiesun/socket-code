@@ -71,6 +71,7 @@ def main():
     finally:
         server_socket.close()
         print("Server socket closed.")
+        print("Waiting all threads to finish execution.")
         for t in threads:
             t.join()
         print("All threads have finished execution.")

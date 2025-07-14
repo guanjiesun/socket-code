@@ -44,6 +44,7 @@ def main():
     finally:
         server_socket.close()  # 关闭服务器套接字, 不再接受新的连接
         print("Server socket closed.")
+        print("Waiting all threads to finish execution.")
         for t in threads:
             t.join()  # 阻塞主线程, 直到所有以的子线程执行完毕
         print("All threads have finished execution.")
