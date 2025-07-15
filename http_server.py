@@ -1,5 +1,6 @@
 import socket
 import threading
+import uuid
 
 
 def handle_client(conn_sock):
@@ -28,6 +29,7 @@ def handle_client(conn_sock):
                     f"{http_version} 200 OK\r\n"
                     "Content-Type: text/html; charset=utf-8\r\n"
                     f"Content-Length: {len(body.encode('utf-8'))}\r\n"
+                    f"Set-Cookie: sessionid={str(uuid.uuid4())}\r\n"
                     "Connection: keep-alive\r\n"
                     "\r\n"
                     f"{body}"
@@ -38,6 +40,7 @@ def handle_client(conn_sock):
                     f"{http_version} 405 Method Not Allowed\r\n"
                     "Content-Type: text/html\r\n"
                     f"Content-Length: {len(body.encode('utf-8'))}\r\n"
+                    f"Set-Cookie: sessionid={str(uuid.uuid4())}\r\n"
                     "Connection: keep-alive\r\n"
                     "\r\n"
                     f"{body}"
