@@ -17,7 +17,7 @@ def main():
         try:
             client_socket.sendto(message.encode(), (server_name, server_port))
             modified_message, server_address = client_socket.recvfrom(1024)
-            print(f"[{server_address[0]}:{server_address[1]}]: {modified_message.decode()}\n")
+            print(f"[Server {server_address[0]}:{server_address[1]}]: {modified_message.decode()}\n")
         except socket.timeout:
             print("Request timed out. No response from server. Is the server running?\n")
 
