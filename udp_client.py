@@ -1,4 +1,5 @@
 import socket
+import threading
 
 
 def main():
@@ -9,20 +10,25 @@ def main():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_socket.settimeout(2)
 
-    while True:
-        message = input('Input lowercase sentence: ')
-        if message.lower() in ['exit', 'quit']:
-            print('Exiting client...')
-            break
-        try:
-            client_socket.sendto(message.encode(), (server_name, server_port))
-            modified_message, server_address = client_socket.recvfrom(1024)
-            print(f"[Server {server_address[0]}:{server_address[1]}]: {modified_message.decode()}\n")
-        except socket.timeout:
-            print("Request timed out. No response from server. Is the server running?\n")
-
-    client_socket.close()
+    try:
+        while True:
+            message = input('Input lowercase sentence: ')
+            if message.lower() in ['exit', 'quit']:
+                print('Exiting client...')
+                break
+            try:
+                client_socket.sendto(message.encode(), (server_name, server_port))
+                modified_message, server_address = client_socket.recvfrom(1024)
+                print(f"[Server {server_address[0]}:{server_address[1]}]: {modified_message.decode()}\n")
+            except socket.timeout:
+                print("Request timed out. No response from server. Is the server running?\n")
+    except KeyboardInterrupt:
+        print("\n\nClient shutting down...\n")
+    finally:
+        client_socket.close()
 
 
 if __name__ == "__main__":
+    print(f"[{threading.current_thread().name}] starting...")
     main()
+    print(f"[{threading.current_thread().name}] ending...")
