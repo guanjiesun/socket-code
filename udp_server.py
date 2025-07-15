@@ -17,7 +17,7 @@ def main():
     server_name = '0.0.0.0'
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket.bind((server_name, server_port))
-    print(f'[server {server_name:server_port}] is ready to receive...')
+    print(f'[server {server_name}:{server_port}] is ready to receive...')
 
     try:
         while True:
