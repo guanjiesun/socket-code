@@ -13,7 +13,7 @@ def handle_client(conn_sock):
             request = conn_sock.recv(1024).decode()
             if not request:
                 # 客户端端开连之后, 会发送一个空请求, 这时可以认为客户端已经断开连接
-                print(f"[Client {client_addr}] disconnected.")
+                print(f"[{threading.current_thread().name}] [Client {client_addr}] disconnected.")
                 break
 
             request_line = request.splitlines()[0]             # 获取请求行
@@ -48,7 +48,6 @@ def handle_client(conn_sock):
             conn_sock.sendall(response.encode())
     finally:
         conn_sock.close()
-        print("Conn socket closed.\n")
 
 
 def main():
