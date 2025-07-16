@@ -10,7 +10,7 @@ SERVER_PORT = 9999
 def handle_client(conn_sock):
     """处理客户端请求的函数"""
     client_addr = conn_sock.getpeername()
-    print(f"[{threading.current_thread().name}] handling [client {client_addr}]")
+    print(f"[{threading.current_thread().name}] [client {client_addr}]")
 
     try:
         while True:
