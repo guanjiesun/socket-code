@@ -1,6 +1,7 @@
 import socket
 import threading
 import uuid
+import json
 
 
 SERVER_NAME = '0.0.0.0'
@@ -16,7 +17,7 @@ def handle_client(conn_sock):
         while True:
             request = conn_sock.recv(1024).decode()
             if not request:
-                # 客户端端开连之后, 会发送一个空请求, 这时可以认为客户端已经断开连接
+                # 客户端端开连接之后, 会发送一个空请求, 这时可以认为客户端已经断开连接
                 print(f"[{threading.current_thread().name}] [Client {client_addr}] disconnected.")
                 break
 
@@ -24,21 +25,43 @@ def handle_client(conn_sock):
             method, path, http_version = request_line.split()  # 解析请求行, 获取请求方法, 路径和 HTTP 版本
 
             if method == 'GET':
-                if path in ['/', '/index.html']:
+                if path == '/' or path == '/index.html':
                     status_code = 200
                     reason_phrase = 'OK'
                     body = "<html><body><h1 style='color:red;'>Welcome to my web server!</h1></body></html>"
-                else:
+                    content_type = 'text/html; charset=utf-8'
+                elif path == '/json':
+                    status_code = 200
+                    reason_phrase = 'OK'
+                    data = {
+                        "message": "hello from json",
+                        "session_id": str(uuid.uuid4()),
+                        "status": "success",
+                    }
+                    body = json.dumps(data)
+                    content_type = 'application/json; charset=utf-8'
+                elif path == '/forbidden':
+                    status_code = 403
+                    reason_phrase = 'Forbidden'
+                    body = "<html><body><h1>403 Forbidden</h1></body></html>"
+                    content_type = 'text/html; charset=utf-8'
+                elif path == '/not-found':
                     status_code = 404
                     reason_phrase = 'Not Found'
                     body = "<html><body><h1>404 Not Found</h1></body></html>"
+                    content_type = 'text/html; charset=utf-8'
+                else:
+                    status_code = 204
+                    reason_phrase = 'No Content'
+                    body = ""
+                    content_type = 'text/html; charset=utf-8'
 
                 response = (
                     f"{http_version} {status_code} {reason_phrase}\r\n"
-                    "Content-Type: text/html; charset=utf-8\r\n"
+                    f"Content-Type: {content_type}\r\n"
                     f"Content-Length: {len(body.encode('utf-8'))}\r\n"
+                    "Connection: close\r\n"
                     f"Set-Cookie: sessionid={str(uuid.uuid4())}; Max-Age=5\r\n"
-                    "Connection: keep-alive\r\n"
                     "\r\n"
                     f"{body}"
                 )
@@ -46,12 +69,13 @@ def handle_client(conn_sock):
                 status_code = 405
                 reason_phrase = 'Method Not Allowed'
                 body = "<h1>405 Method Not Allowed</h1>"
+                content_type = 'text/html; charset=utf-8'
                 response = (
                     f"{http_version} {status_code} {reason_phrase}\r\n"
-                    "Content-Type: text/html\r\n"
+                    f"Content-Type: {content_type}\r\n"
                     f"Content-Length: {len(body.encode('utf-8'))}\r\n"
-                    f"Set-Cookie: sessionid={str(uuid.uuid4())}; Max-Age=5\r\n"
                     "Connection: keep-alive\r\n"
+                    f"Set-Cookie: sessionid={str(uuid.uuid4())}; Max-Age=5\r\n"
                     "\r\n"
                     f"{body}"
                 )
