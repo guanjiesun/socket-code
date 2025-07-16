@@ -3,6 +3,10 @@ import threading
 import uuid
 
 
+SERVER_NAME = '0.0.0.0'
+SERVER_PORT = 9999
+
+
 def handle_client(conn_sock):
     """处理客户端请求的函数"""
     client_addr = conn_sock.getpeername()
@@ -53,13 +57,11 @@ def handle_client(conn_sock):
 def main():
     """一个简单的 HTTP 并发服务器, 能够处理 GET 请求"""
 
-    server_name = '0.0.0.0'
-    server_port = 9999
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    # 创建 TCP 套接字
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # 允许端口重用 
-    server_socket.bind((server_name, server_port))                       # 绑定地址和端口
+    server_socket.bind((SERVER_NAME, SERVER_PORT))                       # 绑定地址和端口
     server_socket.listen(5)                                              # 监听连接请求
-    print(f"HTTP server is running on {server_name}:{server_port}...\n")
+    print(f"HTTP server is running on {SERVER_NAME}:{SERVER_PORT}...\n")
 
     threads = list()
     try:
