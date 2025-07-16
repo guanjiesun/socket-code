@@ -25,12 +25,16 @@ def handle_client(conn_sock):
 
             if method == 'GET':
                 if path in ['/', '/index.html']:
+                    status_code = 200
+                    reason_phrase = 'OK'
                     body = "<html><body><h1 style='color:red;'>Welcome to my web server!</h1></body></html>"
                 else:
+                    status_code = 404
+                    reason_phrase = 'Not Found'
                     body = "<html><body><h1>404 Not Found</h1></body></html>"
 
                 response = (
-                    f"{http_version} 200 OK\r\n"
+                    f"{http_version} {status_code} {reason_phrase}\r\n"
                     "Content-Type: text/html; charset=utf-8\r\n"
                     f"Content-Length: {len(body.encode('utf-8'))}\r\n"
                     f"Set-Cookie: sessionid={str(uuid.uuid4())}; Max-Age=5\r\n"
@@ -39,9 +43,11 @@ def handle_client(conn_sock):
                     f"{body}"
                 )
             else:
+                status_code = 405
+                reason_phrase = 'Method Not Allowed'
                 body = "<h1>405 Method Not Allowed</h1>"
                 response = (
-                    f"{http_version} 405 Method Not Allowed\r\n"
+                    f"{http_version} {status_code} {reason_phrase}\r\n"
                     "Content-Type: text/html\r\n"
                     f"Content-Length: {len(body.encode('utf-8'))}\r\n"
                     f"Set-Cookie: sessionid={str(uuid.uuid4())}; Max-Age=5\r\n"
