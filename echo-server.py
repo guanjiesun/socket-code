@@ -14,10 +14,10 @@ def handle_client(conn, addr):
             request += data
         print(request.decode(), flush=True)
 
-        conn.sendall(request.decode()[::-1].encode())
+        conn.sendall(request)
 
 def main():
-    """ 基于 AF_INET and TCP 的 echo 服务器 """
+    """ echo 服务器: 基于 AF_INET domain and TCP type 的 socket """
     # socket -> s.bind -> s.listen -> s.accept -> s.close
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

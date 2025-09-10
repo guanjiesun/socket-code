@@ -5,7 +5,7 @@ PORT        = 18000
 CHUNK_SIZE  = 1024 * 4
 
 def main():
-    """ 基于 AF_INET and TCP 的 echo 客户端 """
+    """ echo 客户端: 基于 AF_INET domain and TCP type 的 socket """
     # socket -> s.connect -> s.sendall -> s.shutdown -> loop s.recv -> s.close
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((SERVER_ADDR, PORT))
