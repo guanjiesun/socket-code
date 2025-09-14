@@ -1,20 +1,22 @@
 import socket
 
+CHUNK_SIZE = 2048
+HOST = "127.0.0.1"
+PORT = 13000
 
-server_ip, server_port = '127.0.0.1', 13000
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind((server_ip, server_port))
-print('The server is ready to receive...')
+def main():
 
-try:
-    while True:
-        message, client_address = server_socket.recvfrom(2048)
-        print(f"Client -> {client_address[0]}:{client_address[1]} -> {message.decode()}")
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.bind((HOST, PORT))
+        print('Server is ready to receive...')
+        try:
+            while True:
+                msg, addr = s.recvfrom(CHUNK_SIZE)
+                print(f"[{addr[0]}:{addr[1]}]: {msg.decode()}", flush=True)
+                ret = f"Pong from server: {msg.decode()}".encode()
+                s.sendto(ret, addr)
+        except KeyboardInterrupt:
+            print("\nServer shutting down...")
 
-        ret_message = f"Pong from server: {message.decode()}" 
-        server_socket.sendto(ret_message.encode(), client_address)
-except KeyboardInterrupt:
-    print("\nServer shutting down...")
-finally:
-    server_socket.close()
-    print("Server socket closed.")
+if __name__ == '__main__':
+    main()

@@ -1,21 +1,27 @@
-import socket
 import time
+import socket
 
+CHUNK_SIZE = 2048
+HOST = "127.0.0.1"
+PORT = 13000
 
-server_ip, server_port = '127.0.0.1', 13000
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-client_socket.settimeout(1)
+def main():
+    # socket -> settimeout -> sendto -> recvfrom -> close
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.settimeout(5.0)
+        try:
+            for i in range(10):
+                    message = f"Ping {i} from client".encode()
+                    start = time.time()
 
-for i in range(10):
-    try:
-        message = f"Ping {i} from client"
-        start = time.time()
-        client_socket.sendto(message.encode(), (server_ip, server_port))
-        received_message, server_address = client_socket.recvfrom(2048)
-        end = time.time()
-        rtt = (end - start) * 1000
-        print(f"{len(received_message)} bytes from {server_address[0]}:{server_address[1]} -> RTT = {rtt:.2f} ms")
-    except socket.timeout:
-        print("Request timed out. No response from server. Is the server running?\n")
+                    s.sendto(message, (HOST, PORT))
+                    received_message, server_address = s.recvfrom(CHUNK_SIZE)
 
-client_socket.close()
+                    end = time.time()
+                    rtt = (end - start) * 1000
+                    print(f"{len(received_message)} bytes from {server_address[0]}:{server_address[1]}: seq={i} time={rtt:.2f} ms")
+        except socket.timeout:
+            print("Request timed out, no response from server.\nIs the server running?\n")
+
+if __name__ == '__main__':
+    main()
