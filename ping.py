@@ -1,11 +1,12 @@
 import time
 import socket
 
-CHUNK_SIZE = 2048
-HOST = "127.0.0.1"
-PORT = 13000
+HOST        = "127.0.0.1"
+PORT        = 13000
+CHUNK_SIZE  = 1024 * 4
 
 def main():
+    """ ping client based on Internet domain and UDP type socket"""
     # socket -> settimeout -> sendto -> recvfrom -> close
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.settimeout(5.0)
