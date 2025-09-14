@@ -1,4 +1,5 @@
 import socket
+from datetime import datetime
 
 HOST        = '0.0.0.0'
 PORT        = 18000
@@ -9,7 +10,7 @@ def handle_client(conn, addr):
     """ use conn socket to handle each request """
     # conn.recv -> conn.sendall -> conn.close
     with conn:
-        print(f"{addr[0]}:{addr[1]}", flush=True, end=' ')
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} {addr[0]}:{addr[1]}", flush=True, end=' ')
 
         request = b""
         while data := conn.recv(CHUNK_SIZE):
