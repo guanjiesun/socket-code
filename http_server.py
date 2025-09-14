@@ -1,16 +1,16 @@
-import socket
-import threading
 import uuid
 import json
+import socket
+from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 
-SERVER_NAME = '0.0.0.0'
-SERVER_PORT = 9999
+HOST = '0.0.0.0'
+PORT = 9999
 CHUNK = 1024 * 4
 
 def handle_client(conn, addr):
-    """处理客户端请求的函数"""
-    print(f"[{threading.current_thread().name}] [client {addr}]")
-
+    """ Handle request from client using conn socket """
+    # receive the request
     request = b""
     while b"\r\n\r\n" not in request:
         data = conn.recv(CHUNK)
@@ -18,10 +18,15 @@ def handle_client(conn, addr):
             break
         request += data
 
-    headers = request.split("\r\n")
+    # parse the request
+    headers = request.decode().split("\r\n")
     request_line = headers[0]
     method, path, http_version = request_line.split(' ', maxsplit=2)
 
+    # log on stdin
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')}] {addr[0]}:{addr[1]} {method} {path} {http_version}", flush=True)
+
+    # build response
     if method == 'GET':
         if path == '/' or path == '/index.html':
             status_code = 200
@@ -64,6 +69,7 @@ def handle_client(conn, addr):
             f"{body}"
         )
     else:
+        # Only GET request is allowed
         status_code = 405
         reason_phrase = 'Method Not Allowed'
         body = "<h1>405 Method Not Allowed</h1>"
@@ -77,36 +83,28 @@ def handle_client(conn, addr):
             "\r\n"
             f"{body}"
         )
+
+    # send response and close the conn socket
     conn.sendall(response.encode())
     conn.close()
 
 
 def main():
     """ A concurrent HTTP server handles GET reqeust """
+    # socket -> bind -> listen -> accept -> close
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((HOST, PORT))
+        s.listen(5)
+        print(f"\nServer listening on {HOST}:{PORT}...\n")
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    # 创建 TCP 套接字
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # 允许端口重用 
-    s.bind((SERVER_NAME, SERVER_PORT))                       # 绑定地址和端口
-    s.listen(5)                                              # 监听连接请求
-    print(f"Server listening on {SERVER_NAME}:{SERVER_PORT}...\n")
-
-    threads = list()
-    try:
-        while True:
-            conn, addr = s.accept()
-            t = threading.Thread(target=handle_client, args=(conn, addr))
-            t.start()
-            threads.append(t)
-    except KeyboardInterrupt:
-        print("\nServer shutting down...")
-    finally:
-        s.close()
-        print("Server socket closed.")
-        print("Waiting all threads to finish execution.")
-        for t in threads:
-            t.join()
-        print("All threads have finished execution.")
-
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            try:
+                while True:
+                    conn, addr = s.accept()
+                    executor.submit(handle_client, conn, addr)
+            except KeyboardInterrupt:
+                print("\nServer shutting down...", flush=True)
 
 if __name__ == '__main__':
     main()
