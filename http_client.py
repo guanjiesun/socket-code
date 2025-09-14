@@ -1,30 +1,30 @@
 import socket
 
+HOST    = '127.0.0.1'
+PORT    = 9999
+CHUNK   = 1024 * 4
 
 def main():
-    """A simple HTTP client that connects to a server, sends a GET request, and prints the response."""
+    """ A HTTP client based on UNIX domain and TCP type socket """
+    # socket -> connect -> sendall -> recv -> close
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+        client.connect((HOST, PORT))
 
-    server_addr = '127.0.0.1'  # 服务器地址
-    server_port = 9999         # 服务器端口
+        # build request
+        request = (
+            "GET / HTTP/1.1\r\n"
+            "Host: localhost\r\n"
+            "Connection: close\r\n"
+            "User-Agent: DIY-Client\r\n"
+            "\r\n"
+        )
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((server_addr, server_port))
+        # send request
+        client.sendall(request.encode())
+        # receive response
+        response = client.recv(1024)
 
-    # 构造 HTTP 请求
-    request = (
-        "GET / HTTP/1.1\r\n"
-        f"Host: {server_addr}:{server_port}\r\n"
-        "Connection: keep-alive\r\n"
-        "User-Agent: Guanjie's Client\r\n"
-        "\r\n"
-    )
-
-    client_socket.sendall(request.encode())  # 发送请求
-    response = client_socket.recv(1024)      # 接收响应
-    print(f"\n{response.decode()}")          # 打印服务器响应
-
-    client_socket.close()                    # 关闭客户端套接字
-
+        print(f"\n{response.decode()}")
 
 if __name__ == "__main__":
     main()

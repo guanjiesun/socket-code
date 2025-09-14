@@ -1,5 +1,6 @@
 import socket
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 
 HOST        = '0.0.0.0'
 PORT        = 18000
@@ -10,13 +11,12 @@ def handle_client(conn, addr):
     """ use conn socket to handle each request """
     # conn.recv -> conn.sendall -> conn.close
     with conn:
-        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} {addr[0]}:{addr[1]}", flush=True, end=' ')
 
         request = b""
         while data := conn.recv(CHUNK_SIZE):
             request += data
-        print(request.decode(), flush=True)
 
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} {addr[0]}:{addr[1]} {request.decode()}",flush=True)
         conn.sendall(request)
 
 def main():
@@ -28,12 +28,13 @@ def main():
         s.listen(BACKLOG)
         print(f"Listening on {HOST}:{PORT}\n", flush=True) 
 
-        try:
-            while True:
-                conn, addr = s.accept()
-                handle_client(conn, addr)
-        except KeyboardInterrupt:
-            print("\nServer shutting down...")
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            try:
+                while True:
+                    conn, addr = s.accept()
+                    executor.submit(handle_client, conn, addr)
+            except KeyboardInterrupt:
+                print("\nServer shutting down...")
 
 if __name__ == "__main__":
     main()
