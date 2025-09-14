@@ -6,7 +6,7 @@ PORT        = 18000
 CHUNK_SIZE  = 1024 * 4
 
 def worker(msg):
-    """ create a socket based on AF_INET domain and TCP type """
+    """ create a socket based on Internet domain and TCP type """
     # socket -> s.connect -> s.sendall -> s.shutdown -> s.recv -> s.close
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((SERVER_ADDR, PORT))
@@ -17,7 +17,7 @@ def worker(msg):
         response = b""
         while data := s.recv(CHUNK_SIZE):
             response += data
-        print(response.decode())
+        print(response.decode(), flush=True)
 
 def main():
     """ A concurrent echo client """
