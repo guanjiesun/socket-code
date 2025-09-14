@@ -1,11 +1,13 @@
 import socket
 
-HOST = '0.0.0.0'
-PORT = 18000
-BACKLOG = 16
-CHUNK_SIZE = 1024 * 4
+HOST        = '0.0.0.0'
+PORT        = 18000
+BACKLOG     = 16
+CHUNK_SIZE  = 1024 * 4
 
 def handle_client(conn, addr):
+    """ use conn socket to handle each request """
+    # conn.recv -> conn.sendall -> conn.close
     with conn:
         print(f"{addr[0]}:{addr[1]}", flush=True, end=' ')
 
@@ -17,7 +19,7 @@ def handle_client(conn, addr):
         conn.sendall(request)
 
 def main():
-    """ echo 服务器: 基于 AF_INET domain and TCP type 的 socket """
+    """ A concurrent echo server """
     # socket -> s.bind -> s.listen -> s.accept -> s.close
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
