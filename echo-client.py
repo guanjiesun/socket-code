@@ -24,6 +24,8 @@ def main():
     while True:
         try:
             msg = input("INPUT : ").encode()
+            if msg.decode().lower() in ['exit', 'quit', 'bye']:
+                break
         except KeyboardInterrupt:
             print()
             break
