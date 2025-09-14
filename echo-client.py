@@ -17,18 +17,20 @@ def worker(msg):
         response = b""
         while data := s.recv(CHUNK_SIZE):
             response += data
-        print(response.decode(), flush=True)
+        print("OUTPUT:", response.decode(), flush=True)
 
 def main():
-    """ A concurrent echo client """
-    messages = [b"hello", b"world", "孙冠杰".encode(), b"Alice"]
-    threads = [threading.Thread(target=worker, args=(msg,)) for msg in messages]
-
-    for t in threads:
-        t.start()
-
-    for t in threads:
-        t.join()
+    """ echo client """
+    while True:
+        try:
+            msg = input("INPUT : ").encode()
+        except KeyboardInterrupt:
+            print()
+            break
+        else:
+            t = threading.Thread(target=worker, args=(msg,))
+            t.start()
+            t.join()
 
 if __name__ == "__main__":
     main()
