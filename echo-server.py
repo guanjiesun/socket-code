@@ -11,7 +11,6 @@ def handle_client(conn, addr):
     """ use conn socket to handle each request """
     # conn.recv -> conn.sendall -> conn.close
     with conn:
-
         request = b""
         while data := conn.recv(CHUNK_SIZE):
             request += data
